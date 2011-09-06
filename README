@@ -1,1 +1,3 @@
-Library Library
+This hammer repository is for the tools used by the gel servers.  By keeping the tools separated we
+can have an easier setup, closer control over all different platforms having the same versions, and
+smaller sets of libraries we call our own.
