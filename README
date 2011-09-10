@@ -1,3 +1,8 @@
+HAMMER VERSION 1.0
+
 This hammer repository is for the tools used by the gel servers.  By keeping the tools separated we
 can have an easier setup, closer control over all different platforms having the same versions, and
 smaller sets of libraries we call our own.
+
+Every time this repository is updated, we should update the first line of this file and the corresponding
+string in nail/srv/util/patchalot.py so that we know these files are in sync.

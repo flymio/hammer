@@ -1,0 +1,26 @@
+HEY, Jawboner.  This pymysql is a pure python version of MySQLdb used because it is pure
+python, and so even if it may be a little slower than the C MySQLdb case it will play
+better with gevent and allow multipl requests to be handled instead of waiting
+for mysql sockets to do their work.
+
+We monkey-patch this code in for mysqldb in web_gevent.c
+
+See http://code.google.com/p/pymysql for where it comes from.
+
+This code was retrieved with:
+
+  svn checkout http://pymysql.googlecode.com/svn/trunk/ pymysqlRO
+
+so the easiest way to compare with what's live at that repository versus what we have
+is an 'svn status' or simply blow away the full pymysqlRO directory, recreate it with
+the above command, and let git show you what has changed.
+
+
+The only changes we made to support pymysql where
+
+1) monkey patching, as in web_gevent.py
+2) in gel/database.py see the "brent sez" case for mysql and the bug
+   posted about that.  If that bug is resolved then the 2 lines in
+   gel/database.py may be removed
+
+To see any other changes, look in pymysqlRO for "JAWBONE" to see what we may have modified
