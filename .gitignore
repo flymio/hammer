@@ -1,0 +1,15 @@
+# ignore backup files
+*~
+# ignore generated pyc files
+*.pyc
+# ignore generated pyo files
+*.pyo
+# ignore .orig files which are created from git mergetool
+*.orig
+# ignore DS_STORE mac turds
+.DS_Store
+._.DS_Store
+# ignore generated doxygen output
+ios/doxygen/generated
+/.idea/
+xcuserdata

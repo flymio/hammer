@@ -9,10 +9,10 @@ See http://code.google.com/p/pymysql for where it comes from.
 
 This code was retrieved with:
 
-  svn checkout http://pymysql.googlecode.com/svn/trunk/ pymysqlRO
+  svn checkout http://pymysql.googlecode.com/svn/trunk/ pymysql
 
 so the easiest way to compare with what's live at that repository versus what we have
-is an 'svn status' or simply blow away the full pymysqlRO directory, recreate it with
+is an 'svn status' or simply blow away the full pymysql directory, recreate it with
 the above command, and let git show you what has changed.
 
 
@@ -23,4 +23,4 @@ The only changes we made to support pymysql where
    posted about that.  If that bug is resolved then the 2 lines in
    gel/database.py may be removed
 
-To see any other changes, look in pymysqlRO for "JAWBONE" to see what we may have modified
+To see any other changes, look in pymysql for "JAWBONE" to see what we may have modified
