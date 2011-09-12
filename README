@@ -1,4 +1,4 @@
-HAMMER VERSION 1.0
+HAMMER VERSION 1.0.1
 
 This hammer repository is for the tools used by the gel servers.  By keeping the tools separated we
 can have an easier setup, closer control over all different platforms having the same versions, and

@@ -1,0 +1,7 @@
+SOURCE OF PYTHON_MP3: http://ibofobi.dk/stuff/mp3/
+
+retrieved with git using:
+
+   git clone http://github.com/kirkeby/python-mp3.git python_mp3
+
+This some debuggin was done to this code with yiqyaq/radioeweave. Search for "jawbone" to find these. 
