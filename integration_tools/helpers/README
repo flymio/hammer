@@ -1,0 +1,14 @@
+The helper scripts in here are primarily for terminal git integration.
+
+ - git-completion.bash: This is a bash completion file which adds all of the basic git commands and tab-complete for branches ontop of your git binary.
+    To use it, add:
+        [ -f <repo_location>/integration_tools/helpers/git_completion.bash ] && source <repo_location>/integration_tools/helpers/git_completion.bash
+
+    to your .bashrc, .bash_profile, etc.
+
+ - git_bash_prompt: This script prepends your prompt with (<branch_name> <HEAD_tag>).
+    To use it, add:
+        [ -f <repo_location>/integration_tools/helpers/git_bash_prompt ] && source <repo_location>/integration_tools/helpers/git_bash_prompt
+
+    to your .bashrc, .bash_profile, etc.
+

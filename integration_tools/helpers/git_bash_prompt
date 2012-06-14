@@ -1,0 +1,29 @@
+#! /bin/bash
+
+function parse_git_branch {
+    BRANCH=$(git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
+	[ -z "$BRANCH" ] && return
+	    TAG=$(git log -1 $rev --format=format:"%h" 2> /dev/null | sed -e 's/\(.*\)/\1/')
+		echo "($BRANCH $TAG)"
+}
+ 
+# Load our prompt
+function proml {
+  local         QUIET="\[\033[37m\]"
+  local         RESET="\[\033[0m\]"
+  local       DEFAULT="\[\033[22;32;49m\]"
+  local          ATTN="\[\033[1;31m\]"
+  case $TERM in
+    xterm*)
+    TITLEBAR='\[\033]0;\u@\h:\w\007\]'
+    ;;
+    *)
+    TITLEBAR=""
+    ;;
+  esac
+PS1="${TITLEBAR}\
+\$(parse_git_branch)${PS1}" 
+PS2='> '
+PS4='+ '
+}
+proml

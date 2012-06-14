@@ -1,0 +1,157 @@
+#!/usr/bin/env python
+import getopt
+import json
+
+import os
+import sys
+import logging
+from restkit import BasicAuth, Resource, request
+from restkit.errors import Unauthorized
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logging.basicConfig(format="%(message)s")
+username, password = None, None
+auth = None
+_cache = {}
+
+headers = {
+    "Content-type": "application/json",
+    "Accept": "application/json"
+}
+
+base_url = "https://jira-test.aliph.com"
+
+actions = [
+    "help", "issue="
+]
+
+def _execute_cmd(cmd):
+    with os.popen(cmd) as p:
+        output = p.readline()
+    p.close()
+    return output.strip("\n")
+
+
+def print_dict(prefix, dictionary):
+    for key in dictionary.keys():
+        if isinstance(dictionary[key], dict):
+            print_dict("%s\t" % prefix, dictionary[key])
+        else:
+            print "%skey:%s\t val: %s" % (prefix, key, dictionary[key])
+        print "\n"
+
+
+def _get_server():
+    _cache["base_url"] = _execute_cmd("git config jira.server")
+
+
+def _setup_auth():
+    username = _execute_cmd("git config jira.username")
+    password = _execute_cmd("git config jira.password")
+    _cache["auth"] = BasicAuth(username, password)
+
+
+def get_branch():
+    branch = _execute_cmd("git rev-parse --abbrev-ref HEAD")
+    return branch
+
+
+def login():
+    print auth
+    full_path = "%s/rest/auth/1/session" % _cache["base_url"]
+    response = Resource(full_path, filters=[_cache["auth"]]).get(headers=headers)
+    body = response.body_string()
+
+    logger.debug("STATUS: %d" % response.status_int)
+    logger.debug("BODY: %s" % body)
+    logger.debug("HEADERS: %s" % response.headers)
+
+
+def start_issue(issue):
+    full_path = "%s/rest/api/2/issue/%s/transitions" % (_cache["base_url"], issue)
+    response = Resource(full_path, filters=[_cache["auth"]]).get(headers=headers)
+    body = response.body_string()
+
+    data = json.loads(body)
+    start_key = None
+    for i in data["transitions"]:
+        if i["name"] == "Start Progress":
+            start_key = i["id"]
+
+    if start_key is not None:
+        update = {
+            "update": {
+                "comment": [{"add": {"body": "Starting issue: %s" % issue}}]
+            },
+            "transition": {
+                "id": start_key
+            }
+        }
+        response = Resource(full_path, filters=[_cache["auth"]]).post(payload=json.dumps(update), headers=headers)
+        if response.status_int == 204:
+            new_branch = "%s-%s" % (issue, get_branch())
+            git_output = _execute_cmd("git checkout -B %s" % new_branch)
+            print "Created new branch '%s' for issue '%s'" % (new_branch, issue)
+        elif response.status_int == 400:
+            print "Whoops, looks like we tried to do an invalid transition... (%d)" % start_key
+        elif response.status_int == 404:
+            print "The issue '%s' does not exist, or you do not have the permissions to start it." % issue
+        else:
+            print "We received an unexpected status code: %d" % response.status_in
+            print "%s" % response.body_string()
+
+
+
+def usage():
+    print """
+Contacts JIRA to perform a variety of actions.
+
+usage: git jira [-h, -l] -i issue_number -a action
+
+OPTIONS:
+    -h, --help                  show this help message
+    -l, --list-actions          list the possible JIRA actions and their arguments
+    -a, --action=<the_action>   the action to perform
+    -i  --issue=<the_issue>     the JIRA issue that action will be performed on
+"""
+def main():
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hi:", actions)
+    except getopt.GetoptError, err:
+        print str(err)
+        usage()
+        sys.exit(0)
+
+
+    issue = None
+    for o, a in opts:
+        print o, a
+        if o in ("-h", "--help"):
+            usage()
+            sys.exit(0)
+        elif o in ("-i", "--issue"):
+            issue = a
+
+    if issue is not None:
+        if "base_url" not in _cache.keys():
+            _get_server()
+        if "auth" not in _cache.keys():
+            _setup_auth()
+
+
+        try:
+            start_issue(issue)
+        except Unauthorized:
+            login()
+            start_issue(issue)
+    else:
+        logger.debug("No issue provided.")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception:
+        logger.exception("An error occurred trying to run git-start:")
